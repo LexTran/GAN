@@ -50,12 +50,7 @@ tfs = transforms.Compose([
 ])
 
 dataset = torchvision.datasets.ImageFolder(root=data_path1, transform=tfs)
-length = len(dataset) 
-len_list = [math.ceil(0.9*length), math.floor(0.1*length)]
-# random split train/val for k-fold cross validation
-train_set, val_set = torch.utils.data.random_split(dataset,lengths=len_list,generator=torch.Generator().manual_seed(42))
-
-train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=False, drop_last=True)
+train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=False, drop_last=True)
 
 # model
 model_g = Generator(int(args.z_dim), int(args.ngf))
@@ -79,6 +74,8 @@ def train(epoch):
     model_g.train()
     model_d.train()
     for i in range(epoch):
+        total_g_loss = 0
+        total_d_loss = 0
         fixed_z = torch.randn(1, int(args.z_dim), 1, 1).to(device)
         for image, _ in train_loader:
             # data prepare
@@ -107,8 +104,12 @@ def train(epoch):
             d_optim.step()
 
             # record loss
-            writer.add_scalar('g_loss', g_loss.item(), i)
-            writer.add_scalar('d_loss', d_loss.item(), i)
+            total_g_loss += g_loss.item()
+            total_d_loss += d_loss.item()
+
+        writer.add_scalar('g_loss', total_g_loss/len(train_loader), i)
+        writer.add_scalar('d_loss', total_d_loss/len(train_loader), i)
+        print('Epoch [%d/%d], d_loss: %.4f, g_loss: %.4f', (i + 1, epoch, total_d_loss/len(train_loader), total_g_loss/len(train_loader)))
 
         # save image
         if (i+1) % 50 == 0:
