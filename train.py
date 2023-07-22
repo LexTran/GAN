@@ -110,20 +110,20 @@ def train(epoch):
             writer.add_scalar('g_loss', g_loss.item(), i)
             writer.add_scalar('d_loss', d_loss.item(), i)
 
-            # save image
-            if i % 50 == 0:
-                with torch.no_grad():
-                    # save checkpoints
-                    state = {
-                        'generator': model_g.state_dict(),
-                        'discriminator': model_d.state_dict(),
-                        'epoch': epoch + 1
-                    }
-                    model_g.eval()
-                    image = model_g(fixed_z)
-                    writer.add_scalar('image', image, i)
-                    torch.save(state, f'{args.save_path}/{epoch + 1}.pth') # save model and parameters
-                    print('Saving epoch %d model ...' % (epoch + 1))
-                    model_g.train()
+        # save image
+        if i % 50 == 0:
+            with torch.no_grad():
+                # save checkpoints
+                state = {
+                    'generator': model_g.state_dict(),
+                    'discriminator': model_d.state_dict(),
+                    'epoch': epoch + 1
+                }
+                model_g.eval()
+                image = model_g(fixed_z)
+                writer.add_image('generated_image', image[0], i)
+                torch.save(state, f'{args.save_path}/{epoch + 1}.pth') # save model and parameters
+                print('Saving epoch %d model ...' % (epoch + 1))
+                model_g.train()
 
 train(int(args.epoch))
