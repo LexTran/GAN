@@ -111,7 +111,7 @@ def train(epoch):
             writer.add_scalar('d_loss', d_loss.item(), i)
 
         # save image
-        if i % 50 == 0:
+        if (i+1) % 50 == 0:
             with torch.no_grad():
                 # save checkpoints
                 state = {
@@ -122,8 +122,8 @@ def train(epoch):
                 model_g.eval()
                 image = model_g(fixed_z)
                 writer.add_image('generated_image', image[0], i)
-                torch.save(state, f'{args.save_path}/{epoch + 1}.pth') # save model and parameters
-                print('Saving epoch %d model ...' % (epoch + 1))
+                torch.save(state, f'{args.save_path}/{i + 1}.pth') # save model and parameters
+                print('Saving epoch %d model ...' % (i + 1))
                 model_g.train()
 
 train(int(args.epoch))
