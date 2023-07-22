@@ -17,7 +17,7 @@ class Generator(nn.Module):
         for i in range(len(channels)):
             net.append(nn.ConvTranspose2d(channels[i], channels_out[i], 4, stride[i], padding[i], bias=False))
             if active[i] == "relu":
-                net.append(nn.GroupNorm(channels_out[i]//32, channels_out[i]))
+                net.append(nn.GroupNorm(32, channels_out[i]))
                 net.append(nn.ReLU(True))
             elif active[i] == "tanh":
                 net.append(nn.Tanh())
@@ -54,7 +54,7 @@ class Discriminator(nn.Module):
             if i == 0:
                 net.append(nn.LeakyReLU(0.2))
             elif active[i] == "lrelu":
-                net.append(nn.GroupNorm(channels_out[i]//32, channels_out[i]))
+                net.append(nn.GroupNorm(32, channels_out[i]))
                 net.append(nn.LeakyReLU(0.2))
             elif active[i] == "sigmoid":
                 net.append(nn.Sigmoid())
