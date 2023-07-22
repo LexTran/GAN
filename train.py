@@ -55,7 +55,7 @@ len_list = [math.ceil(0.9*length), math.floor(0.1*length)]
 # random split train/val for k-fold cross validation
 train_set, val_set = torch.utils.data.random_split(dataset,lengths=len_list,generator=torch.Generator().manual_seed(42))
 
-train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=False)
+train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=False, drop_last=True)
 
 # model
 model_g = Generator(int(args.z_dim), int(args.ngf))
