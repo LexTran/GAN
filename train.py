@@ -57,6 +57,7 @@ model_g = Generator(int(args.z_dim), int(args.ngf))
 model_d = Discriminator(int(args.ndf))
 
 # load model
+start_epoch = 0
 if args.resume_path:
     checkpoint = torch.load(args.resume_path)
     model_g.load_state_dict(checkpoint['generator'])
@@ -81,7 +82,7 @@ def train(epoch):
     writer = SummaryWriter(args.board)
     model_g.train()
     model_d.train()
-    for i in range(epoch):
+    for i in range(start_epoch, start_epoch+epoch):
         total_g_loss = 0
         total_d_loss = 0
         fixed_z = torch.randn(1, int(args.z_dim), 1, 1).to(device)
