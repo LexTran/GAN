@@ -25,7 +25,7 @@ parser.add_argument('--z_dim', default=100, help='dimension of latent z vector')
 parser.add_argument('--ngf', default=64, help='dimension of generator feature map')
 parser.add_argument('--ndf', default=64, help='dimension of discriminator feature map')
 parser.add_argument('--bs', default=32, help='batch size')
-parser.add_argument('--lr', default=0.01, help="learning rate")
+parser.add_argument('--lr', default=0.0002, help="learning rate")
 parser.add_argument('--l1', default=1, help="lambda1 for adversarial loss")
 parser.add_argument('--board', default='./runs', help="tensorboard path")
 parser.add_argument('--save_path', default='./checkpoints/', help="save path")
@@ -55,6 +55,14 @@ train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_work
 # model
 model_g = Generator(int(args.z_dim), int(args.ngf))
 model_d = Discriminator(int(args.ndf))
+
+# load model
+if args.resume_path:
+    checkpoint = torch.load(args.resume_path)
+    model_g.load_state_dict(checkpoint['generator'])
+    model_d.load_state_dict(checkpoint['discriminator'])
+    start_epoch = checkpoint['epoch']
+    print('Load checkpoint at epoch %d.' % start_epoch)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model_g = model_g.to(device)
@@ -118,7 +126,7 @@ def train(epoch):
                 state = {
                     'generator': model_g.state_dict(),
                     'discriminator': model_d.state_dict(),
-                    'epoch': epoch + 1
+                    'epoch': i + 1
                 }
                 model_g.eval()
                 image = model_g(fixed_z)
